@@ -1,0 +1,277 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import Header from '../components/Header.astro';
+
+type Heading = { depth: number; slug: string; text: string };
+type Props = CollectionEntry<'blog'>['data'] & { headings?: Heading[] };
+
+const { title, description, pubDate, updatedDate, heroImage, ogImage, headings = [] } = Astro.props;
+const chapters = headings.filter((h) => h.depth === 2);
+const shareImage = ogImage ?? heroImage;
+---
+
+<html lang="en">
+	<head>
+		<BaseHead
+			title={title}
+			description={description}
+			image={shareImage}
+			imageAlt={title}
+			type="article"
+		/>
+		<style>
+			/* slim reading-progress line — the only chrome, for the long scroll */
+			.reading-progress {
+				position: fixed;
+				top: 0;
+				left: 0;
+				height: 2px;
+				width: 0;
+				background: var(--accent);
+				z-index: 50;
+				transition: width 0.08s linear;
+			}
+
+			main {
+				width: 100%;
+				max-width: 100%;
+				margin: 0;
+				padding: 0;
+			}
+
+			/* the page (the column of text) */
+			.prose {
+				width: 38rem;
+				max-width: calc(100% - 2.5em);
+				margin: auto;
+				padding: 2.5em 0 1em;
+				color: var(--ink);
+			}
+
+			/* title block */
+			.title {
+				margin-bottom: 2.5em;
+				text-align: center;
+			}
+			.title .date {
+				margin-bottom: 1.2em;
+				font-family: var(--font-body), serif;
+				font-size: 0.82em;
+				letter-spacing: 0.08em;
+				text-transform: uppercase;
+				color: var(--ink-soft);
+			}
+			.title h1 {
+				margin: 0;
+				font-family: var(--font-display), Georgia, serif;
+				font-weight: 600;
+				font-size: 2.9em;
+				line-height: 1.08;
+				letter-spacing: -0.01em;
+			}
+			.subtitle {
+				margin: 0.55em 0 0;
+				font-family: var(--font-body), serif;
+				font-style: italic;
+				font-size: 1.15em;
+				color: var(--ink-soft);
+			}
+			.title hr {
+				width: 2.5em;
+				margin: 1.4em auto 0;
+				border: none;
+				border-top: 1px solid rgba(122, 90, 51, 0.4);
+			}
+			.last-updated-on {
+				font-style: italic;
+			}
+
+			/* contents — the map of the journey, book-frontispiece style */
+			.toc {
+				max-width: 27em;
+				margin: 0 auto 3.5em;
+				padding: 1.5em 0;
+				border-top: 1px solid rgba(122, 90, 51, 0.22);
+				border-bottom: 1px solid rgba(122, 90, 51, 0.22);
+				text-align: center;
+			}
+			.toc-label {
+				margin: 0 0 1em;
+				font-family: var(--font-display), serif;
+				font-size: 0.72em;
+				letter-spacing: 0.22em;
+				text-transform: uppercase;
+				color: var(--ink-soft);
+			}
+			.toc ol {
+				list-style: none;
+				margin: 0;
+				padding: 0;
+			}
+			.toc li {
+				margin: 0.5em 0;
+			}
+			.toc a {
+				color: var(--ink);
+				text-decoration: none;
+				font-size: 0.98em;
+				line-height: 1.4;
+				transition: color 0.15s ease;
+			}
+			.toc a:hover {
+				color: var(--accent);
+			}
+
+			/* chapter headings (## …) — centered, display face, with a fleuron above */
+			.prose :global(h2) {
+				font-family: var(--font-display), Georgia, serif;
+				font-weight: 600;
+				font-size: 1.35em;
+				line-height: 1.3;
+				text-align: center;
+				letter-spacing: 0.01em;
+				color: var(--ink);
+				margin: 2.6em auto 1.6em;
+				max-width: 24em;
+				scroll-margin-top: 1.2rem;
+			}
+			.prose :global(h2)::before {
+				content: "❧";
+				display: block;
+				font-size: 1.1em;
+				color: rgba(122, 90, 51, 0.55);
+				margin-bottom: 0.7em;
+				font-weight: 400;
+			}
+
+			/* drop cap on the very first paragraph of the story */
+			.prose :global(p.lead-cap)::first-letter,
+			.prose :global(hr) + :global(h2) + :global(p)::first-letter {
+				font-family: var(--font-display), Georgia, serif;
+				float: left;
+				font-size: 3.1em;
+				line-height: 0.78;
+				padding: 0.05em 0.08em 0 0;
+				color: var(--accent-dark);
+			}
+
+			/* back to the top, after the long read */
+			.to-top {
+				display: block;
+				text-align: center;
+				margin: 3.5em 0 1em;
+				font-family: var(--font-display), serif;
+				font-size: 0.72em;
+				letter-spacing: 0.2em;
+				text-transform: uppercase;
+				color: var(--ink-soft);
+				text-decoration: none;
+			}
+			.to-top:hover {
+				color: var(--accent);
+			}
+
+			@media (max-width: 720px) {
+				.title h1 {
+					font-size: 2.1em;
+				}
+				.prose {
+					padding-top: 1.5em;
+				}
+			}
+			@media (max-width: 600px) {
+				.prose {
+					max-width: calc(100% - 1.6em);
+					padding-top: 1.2em;
+				}
+				.title {
+					margin-bottom: 1.8em;
+				}
+				.title h1 {
+					font-size: 1.85em;
+				}
+				.title .date {
+					font-size: 0.74em;
+				}
+				.subtitle {
+					font-size: 1.05em;
+				}
+				.toc {
+					margin-bottom: 2.5em;
+				}
+				.prose :global(h2) {
+					font-size: 1.18em;
+					margin: 2em auto 1.2em;
+				}
+				/* a gentler drop cap on narrow screens */
+				.prose :global(hr) + :global(h2) + :global(p)::first-letter {
+					font-size: 2.6em;
+				}
+			}
+		</style>
+	</head>
+
+	<body>
+		<div class="reading-progress" id="reading-progress"></div>
+		<Header />
+		<main>
+			<article>
+				<div class="prose">
+					<div class="title" id="top">
+						<div class="date">
+							<FormattedDate date={pubDate} />
+							{
+								updatedDate && (
+									<div class="last-updated-on">
+										Last updated on <FormattedDate date={updatedDate} />
+									</div>
+								)
+							}
+						</div>
+						<h1>{title}</h1>
+						{description && <p class="subtitle">{description}</p>}
+						<hr />
+					</div>
+
+					{
+						chapters.length > 1 && (
+							<nav class="toc" aria-label="Chapters">
+								<p class="toc-label">Contents</p>
+								<ol>
+									{chapters.map((c) => (
+										<li>
+											<a href={`#${c.slug}`}>{c.text}</a>
+										</li>
+									))}
+								</ol>
+							</nav>
+						)
+					}
+
+					<slot />
+
+					<a class="to-top" href="#top">↑ Back to the top</a>
+				</div>
+			</article>
+		</main>
+		<Footer />
+
+		<script is:inline>
+			(() => {
+				const bar = document.getElementById('reading-progress');
+				if (!bar) return;
+				const update = () => {
+					const h = document.documentElement;
+					const max = h.scrollHeight - h.clientHeight;
+					bar.style.width = max > 0 ? (h.scrollTop / max) * 100 + '%' : '0';
+				};
+				document.addEventListener('scroll', update, { passive: true });
+				window.addEventListener('resize', update);
+				update();
+			})();
+		</script>
+	</body>
+</html>

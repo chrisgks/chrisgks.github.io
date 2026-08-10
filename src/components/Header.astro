@@ -1,0 +1,87 @@
+---
+import { SITE_TITLE } from '../consts';
+import HeaderLink from './HeaderLink.astro';
+---
+
+<header>
+	<nav>
+		<h2>
+			<a class="brand" href="/" aria-label={SITE_TITLE}>
+				<img
+					class="brand-mark"
+					src="/images/logo-integral.webp"
+					width="36"
+					height="36"
+					alt=""
+					decoding="async"
+				/>
+				<span class="brand-name">{SITE_TITLE}</span>
+			</a>
+		</h2>
+		<div class="internal-links">
+			<HeaderLink href="/">Writing</HeaderLink>
+			<HeaderLink href="/about">About</HeaderLink>
+		</div>
+	</nav>
+</header>
+<style>
+	header {
+		margin: 0;
+		padding: 0 1em;
+		background: var(--paper, #fff);
+		box-shadow: 0 2px 8px rgba(var(--black), 5%);
+	}
+	h2 {
+		margin: 0;
+		font-size: 1em;
+	}
+
+	h2 a,
+	h2 a.active {
+		text-decoration: none;
+	}
+	.brand {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.55rem;
+		padding: 0.65em 0.5em;
+		color: var(--ink, rgb(var(--black)));
+		border-bottom: none !important;
+	}
+	.brand-mark {
+		display: block;
+		width: 1.7rem;
+		height: 1.7rem;
+		object-fit: contain;
+		border-radius: 0.2rem;
+	}
+	.brand-name {
+		font-family: var(--font-display), Georgia, serif;
+		font-weight: 600;
+		letter-spacing: 0.01em;
+	}
+	nav {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+	nav a {
+		padding: 1em 0.5em;
+		color: var(--ink, rgb(var(--black)));
+		border-bottom: 4px solid transparent;
+		text-decoration: none;
+	}
+	nav a.active {
+		text-decoration: none;
+		border-bottom-color: var(--accent);
+	}
+	.social-links,
+	.social-links a {
+		display: flex;
+	}
+	@media (max-width: 720px) {
+		.social-links {
+			display: none;
+		}
+	}
+</style>

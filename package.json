@@ -1,0 +1,24 @@
+{
+  "name": "blog",
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "node scripts/publish-essay.mjs && astro build",
+    "preview": "astro preview",
+    "astro": "astro",
+    "publish": "node scripts/publish-essay.mjs",
+    "watch:essays": "node scripts/publish-essay.mjs --watch",
+    "optimize": "node scripts/optimize-images.mjs"
+  },
+  "dependencies": {
+    "@astrojs/mdx": "^6.0.3",
+    "@astrojs/rss": "^4.0.18",
+    "@astrojs/sitemap": "^3.7.3",
+    "astro": "^6.4.7",
+    "sharp": "^0.34.3"
+  }
+}

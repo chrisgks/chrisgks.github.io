@@ -1,0 +1,136 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import Header from '../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TAGLINE, SITE_TITLE } from '../consts';
+
+const posts = (await getCollection('blog')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead
+			title={SITE_TITLE}
+			description={SITE_DESCRIPTION}
+			image="/images/og-default.jpg"
+			imageAlt={SITE_TITLE}
+		/>
+		<style>
+			.intro {
+				margin-bottom: 3rem;
+			}
+			.intro h1 {
+				margin: 0 0 0.25rem 0;
+				font-size: 2.441em;
+			}
+			.intro p {
+				margin: 0;
+				color: rgb(var(--gray));
+				font-style: italic;
+			}
+
+			ul.posts {
+				list-style: none;
+				margin: 0;
+				padding: 0;
+				display: flex;
+				flex-direction: column;
+				gap: 2.5rem;
+			}
+			ul.posts li a {
+				display: flex;
+				gap: 1.5rem;
+				align-items: center;
+				text-decoration: none;
+				color: inherit;
+			}
+			.thumb {
+				flex: 0 0 200px;
+				width: 200px;
+				height: 200px;
+				object-fit: contain;
+				border-radius: 12px;
+				background: rgb(var(--gray-light));
+				transition: box-shadow 0.2s ease;
+			}
+			ul.posts li a:hover .thumb {
+				box-shadow: var(--box-shadow);
+			}
+			.meta {
+				min-width: 0;
+			}
+			.meta .title {
+				margin: 0 0 0.2rem 0;
+				font-size: 1.563em;
+				line-height: 1.15;
+				color: rgb(var(--black));
+				transition: color 0.2s ease;
+			}
+			ul.posts li a:hover .title {
+				color: rgb(var(--accent));
+			}
+			.meta .desc {
+				margin: 0 0 0.4rem 0;
+				color: rgb(var(--gray-dark));
+			}
+			.meta .date {
+				margin: 0;
+				font-size: 0.9em;
+				color: rgb(var(--gray));
+			}
+
+			@media (max-width: 600px) {
+				ul.posts li a {
+					flex-direction: column;
+					align-items: stretch;
+					gap: 0.75rem;
+				}
+				.thumb {
+					flex: none;
+					align-self: center;
+					width: 240px;
+					max-width: 100%;
+					height: 240px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<section class="intro">
+				<h1>{SITE_TITLE}</h1>
+				<p>{SITE_TAGLINE}</p>
+			</section>
+
+			<section>
+				<ul class="posts">
+					{
+						posts.map((post) => (
+							<li>
+								<a href={`/blog/${post.id}/`}>
+									{post.data.heroImage && (
+										<img class="thumb" src={post.data.heroImage} alt="" loading="lazy" />
+									)}
+									<div class="meta">
+										<h2 class="title">{post.data.title}</h2>
+										<p class="desc">{post.data.description}</p>
+										<p class="date">
+											<FormattedDate date={post.data.pubDate} />
+										</p>
+									</div>
+								</a>
+							</li>
+						))
+					}
+				</ul>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>
